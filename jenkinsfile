@@ -34,7 +34,7 @@ pipeline {
             }
         }
 
-        stage("testing jenkins node") {
+        stage("Create container") {
             steps {
                 sh "docker run -d --name ${JOB_NAME} -p 5000:3000 ${img}"
                 
