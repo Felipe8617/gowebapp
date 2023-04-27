@@ -58,3 +58,31 @@ RUN cd /gowebapp/gowebapp/app.go && go build
 EXPOSE 3000
 
 CMD ["/gowebapp/gowebapp/gowebapp"]
+
+#Asingnin working directory inside image
+WORKDIR /gowebapp
+
+#creating go.mod and go.sum files into images
+COPY . .
+
+RUN go mod download
+
+#copying all .go files into image
+COPY *.go .
+#COPY templates/index.html ./
+
+#creatting build
+RUN go build -o /gowebapp
+
+EXPOSE 6565
+
+CMD [ "/gowebapp"]
+
+
+
+	http.HandleFunc("/", Index)
+
+	//creating the server
+	fmt.Println("el servidor está corriendo en el puerto 3000")
+	fmt.Println("Run server: http://localhost:3000")
+	http.ListenAndServe("localhost:3000", nil)
