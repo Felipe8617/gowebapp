@@ -30,7 +30,7 @@ func main() {
 	http.HandleFunc("/", Index)
 
 	//creating the server
-	fmt.Println("el servidor está corriendo en el puerto 3000")
+	fmt.Println("server is runing on port 3000")
 	fmt.Println("Run server: http://localhost:3000")
 	http.ListenAndServe(":3000", nil)
 
