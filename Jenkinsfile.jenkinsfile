@@ -1,0 +1,76 @@
+pipeline {
+    
+    environment {
+        registry = "felipe8617/pipeline_images"
+        registryCredentials = "docker-hub-credentials"
+        dockerImage = ""
+        sshCredential = "github-ssh-key-new"
+        ec_2credentials = "ec2_deploy_SSH"
+        ec_2credentialsSecret = "ec2_deploy" 
+    }
+    
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: "GitSCM",branches: [[name: '*/test']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-ssh-key-new', url: 'https://github.com/Felipe8617/gowebapp.git']]])
+            }
+        }
+    
+        stage('Build Image') {
+            steps {
+                script {
+                    def stopcontainer = "docker stop ${JOB_NAME}"
+                    def delcontainer = "docker rm ${JOB_NAME}"
+                    def delimages = "docker image prune -a --force"
+                    
+                    sh returnStatus: true, script: "${stopcontainer}"
+                    sh returnStatus: true, script: "${delcontainer}"
+                    sh returnStatus: true, script: "${delimages}"
+                    
+                    img = registry + ":${env.BUILD_ID}"
+                    dockerImage = docker.build("${img}")
+                }             
+                
+            }
+        }
+
+        stage("Create container") {
+            steps {
+                sh "docker run -d --name ${JOB_NAME} -p 5000:3000 ${img}"
+                
+            }
+        }
+        
+
+        stage("push to docker hub") {
+            steps {
+                script {
+                    docker.withRegistry("https://registry.hub.docker.com", registryCredentials) {
+                        dockerImage.push()
+                    }
+                }
+            }
+                
+        }
+
+        stage('Deploy in server'){
+            steps{
+                script{
+                    def stopcontainer = "docker stop ${JOB_NAME}"
+                    def delcontainer = "docker rm ${JOB_NAME}"
+                    def delimages = "docker image prune -a --force"
+                    def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 ${img}"
+
+                    sshagent(credentials: [ec_2credentialsSecret]){
+                        sh returnStatus: true, script: "ssh ubuntu@54.89.22.60 ${stopcontainer}"
+                        sh returnStatus: true, script: "ssh ubuntu@54.89.22.60 ${delcontainer}"
+                        sh returnStatus: true, script: "ssh ubuntu@54.89.22.60 ${delimages}"
+                        sh "ssh ubuntu@54.89.22.60 ${drun}"
+                    }
+                }
+            }
+        }
+    }
+}
