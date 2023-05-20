@@ -13,7 +13,7 @@ type Users struct {
 }
 
 var InfoUser = Users{
-	Name:  "pacho",
+	Name:  "Marlos",
 	Email: "juan@mail.com",
 	Phone: 89887,
 }
