@@ -12,11 +12,17 @@ type Users struct {
 	Phone int
 }
 
+var InfoUser = Users{
+	Name:  "pacho",
+	Email: "juan@mail.com",
+	Phone: 89887,
+}
+
 func Index(rw http.ResponseWriter, r *http.Request) {
 
 	template, err := template.ParseFiles("templates/index.html")
 
-	user := Users{"Felipe Carvajal", "felicia@mail.com", 999999}
+	user := Users{InfoUser.Name, InfoUser.Email, InfoUser.Phone}
 
 	if err != nil {
 		panic(err)

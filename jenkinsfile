@@ -15,6 +15,13 @@ pipeline {
                 checkout([$class: "GitSCM",branches: [[name: '*/test']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-ssh-key-new', url: 'https://github.com/Felipe8617/gowebapp.git']]])
             }
         }
+
+        stages {
+        stage('Unit test') {
+            steps {
+               sh "go test"
+            }
+        }
     
         stage('Build Image') {
             steps {

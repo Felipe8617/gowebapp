@@ -5,9 +5,9 @@ FROM golang:1.19
 WORKDIR /gowebapp
 
 #creating go.mod and go.sum files into images
-COPY go.mod ./
+#COPY go.mod ./
 
-RUN go mod download
+#RUN go mod download
 
 #copying all .go files into image
 COPY . .
