@@ -16,10 +16,9 @@ pipeline {
             }
         }
 
-        stages {
         stage('Unit test') {
             steps {
-               sh "go test"
+                sh "go test"
             }
         }
     
