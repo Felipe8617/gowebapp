@@ -1,22 +1,20 @@
-#creating base image
-FROM golang:1.19
+# #creating base image
+FROM golang:1.20-alpine AS BUILDER
 
-#Asingnin working directory inside image
 WORKDIR /gowebapp
 
-#creating go.mod and go.sum files into images
-#COPY go.mod ./
-
-#RUN go mod download
-
-#copying all .go files into image
 COPY . .
 
+RUN go build -v -o gowebapp .
+#EXPOSE 3000
 
-#creatting build
-#RUN CGO_ENABLED=0 GOOS=linux go build -o gowebapp
-RUN go build -v -o /usr/local/bin/gowebapp ./...
+#CMD ["./gowebapp"]
+
+#multistage docker
+FROM alpine
+WORKDIR /app
+COPY --from=BUILDER /gowebapp /app
 
 EXPOSE 3000
 
-CMD ["gowebapp"]
+CMD [ "./gowebapp" ]
