@@ -4,7 +4,9 @@ pipeline {
         registry = "felipe8617/pipeline_images"
         registryCredentials = "docker-hub-credentials"
         dockerImage = ""
-        sshCredential="github-ssh-key-new"
+        sshCredential = "github-ssh-key-new"
+        ec_2credentials = "ec2_deploy_SSH"
+        ec_2credentialsSecret = "ec2_deploy" 
     }
     
     agent any
@@ -15,70 +17,41 @@ pipeline {
                 checkout([$class: "GitSCM",branches: [[name: '*/test']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-ssh-key-new', url: 'https://github.com/Felipe8617/gowebapp.git']]])
             }
         }
-
-        stage('Unit test') {
+            //verify tipe of variable in the code
+           stage('Unit test') {
             steps {
                 sh "go test"
             }
         }
     
-        stage('Build Image') {
+        stage ('Build and Push to ECR') {
             steps {
-                script {
-                    def stopcontainer = "docker stop ${JOB_NAME}"
-                    def delcontainer = "docker rm ${JOB_NAME}"
-                    def delimages = "docker image prune -a --force"
-                    
-                    sh returnStatus: true, script: "${stopcontainer}"
-                    sh returnStatus: true, script: "${delcontainer}"
-                    sh returnStatus: true, script: "${delimages}"
-                    
-                    img = registry + ":${env.BUILD_ID}"
-                    dockerImage = docker.build("${img}")
-                }             
+                withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
                 
-            }
-        }
-
-        stage("Create container") {
-            steps {
-                sh "docker run -d --name ${JOB_NAME} -p 5000:3000 ${img}"
-                
+                sh "docker build -t ecrpipelinedemo ."
+                sh "docker tag ecrpipelinedemo public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
+                sh "docker push public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
+                }
             }
         }
         
-
-        stage("push to docker hub") {
-            steps {
-                script {
-                    docker.withRegistry("https://registry.hub.docker.com", registryCredentials) {
-                        dockerImage.push()
-                    }
-                }
-            }
-                
-        }
-
+      
         stage('Deploy in server'){
             steps{
                 script{
-                    def stopcontainer = "docker stop ${JOB_NAME}"
-                    def delcontainer = "docker rm ${JOB_NAME}"
+                    def stopcontainer = 'docker stop $(docker ps -a -q)'
+                    def delcontainer = 'docker rm $(docker ps -a -q)'
                     def delimages = "docker image prune -a --force"
-                    def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 ${img}"
+                    def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
 
-                    sshagent(credentials: [sshCredential]){
-                        sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no felipe@192.168.1.95 ${stopcontainer}"
-                        sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no felipe@192.168.1.95 ${delcontainer}"
-                        sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no felipe@192.168.1.95 ${delimages}"
-                        sh "ssh -o StrictHostKeyChecking=no felipe@192.168.1.95 ${drun}"
+                    sshagent(credentials: [ec_2credentialsSecret]){
+                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199${stopcontainer}"
+                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delcontainer}"
+                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delimages}"
+                        sh "ssh ubuntu@44.204.55.199 ${drun}"
                     }
                 }
             }
         }
     }
 }
-
-
-             
-    
