@@ -15,7 +15,7 @@ type Users struct {
 var InfoUser = Users{
 	Name:  "Daniela",
 	Email: "juan@mail.com",
-	Phone: 7894599,
+	Phone: 888888,
 }
 
 func Index(rw http.ResponseWriter, r *http.Request) {
