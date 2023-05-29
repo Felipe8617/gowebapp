@@ -18,52 +18,59 @@ pipeline {
             }
         }
             //verify tipe of variable in the code
-           stage('Unit test') {
+        
+        stage('Unit test') {
             steps {
                 sh "go test"
             }
         }
-    
-    
-        //   stage("sonar analysis") {
-        //     agent {label "sonar_slave"}
+
+
+        // stage('SonarQube analysis') {
         //     environment {
-        //         scannerHome = tool "sonar4.7"
+        //         scannerHome = tool 'sonar4.7'
         //     }
         //     steps {
-        //       withSonarQubeEnv('My SonarQube Server') {
-        //         sh 'mvn clean package sonar:sonar'
-        //       }
-        //     }
-        //   }
-        //   stage("Quality Gate") {
-        //     steps {
-        //       timeout(time: 1, unit: 'HOURS') {
-        //         waitForQualityGate abortPipeline: true
-        //       }
-        //     }
-        //   }
-        // stage('Build Image') {
-        //     steps {
-        //         script {
-        //             def stopcontainer = "docker stop ${JOB_NAME}"
-        //             def delcontainer = "docker rm ${JOB_NAME}"
-        //             def delimages = "docker image prune -a --force"
-                    
-        //             sh returnStatus: true, script: "${stopcontainer}"
-        //             sh returnStatus: true, script: "${delcontainer}"
-        //             sh returnStatus: true, script: "${delimages}"
-                    
-        //             img = registry + ":${env.BUILD_ID}"
-        //             dockerImage = docker.build("${img}")
-        //         }             
-                
+        //         withSonarQubeEnv('sonarcloud') { 
+        //         sh "${scannerHome}/bin/sonar-scanner"
+        //         }
         //     }
         // }
+        
+               
+        stage("SonarQube analysis") {
+
+            steps{
+
+                script{
+                    def scannerHome = tool "sonar4.7";
+                    withSonarQubeEnv("sonarcloud") { 
+                    sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
+
+        stage("Quality Gate"){
+            
+            steps{
+                script{
+                    timeout(time: 1, unit: 'HOURS') {                  
+                    def qg = waitForQualityGate() 
+                        if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }   
+
+
         stage ('Build and Push to ECR') {
             steps {
                 withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
-                
+                // sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/u9q6y4u2"
                 sh "docker build -t ecrpipelinedemo ."
                 sh "docker tag ecrpipelinedemo public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
                 sh "docker push public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
@@ -71,29 +78,17 @@ pipeline {
             }
         }
         
-        
-
-        // stage("push to docker hub") {
-        //     steps {
-        //         script {
-        //             docker.withRegistry("https://registry.hub.docker.com", registryCredentials) {
-        //                 dockerImage.push()
-        //             }
-        //         }
-        //     }
-                
-        // }
-
+      
         stage('Deploy in server'){
             steps{
                 script{
-                    def stopcontainer = 'docker stop $(docker ps -a -q)'
-                    def delcontainer = 'docker rm $(docker ps -a -q)'
+                    def stopcontainer = "docker stop ${JOB_NAME}"
+                    def delcontainer = "docker rm  -f ${JOB_NAME}"
                     def delimages = "docker image prune -a --force"
                     def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
 
                     sshagent(credentials: [ec_2credentialsSecret]){
-                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199${stopcontainer}"
+                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${stopcontainer}"
                         sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delcontainer}"
                         sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delimages}"
                         sh "ssh ubuntu@44.204.55.199 ${drun}"
