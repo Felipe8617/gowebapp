@@ -125,7 +125,7 @@ resource "aws_lb_target_group" "lb_target_group" {
 resource "aws_lb_listener" "ecs_listener" {
   load_balancer_arn = aws_lb.gowebapp_lb.arn
   port              = "3000" /*le añadí las comillas*/
-  protocol          = "HTTP"
+  protocol          = "HTTPS" /*cambie http por https*/
 
   default_action {
     type             = "forward"
