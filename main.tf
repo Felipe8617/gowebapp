@@ -78,11 +78,11 @@ resource "aws_lb" "gowebapp_lb" {
   internal           = false
   security_groups    = [aws_security_group.lb_sg.id]
   subnets            = [aws_default_subnet.def_subnet_a.id, aws_default_subnet.def_subnet_b.id, aws_default_subnet.def_subnet_c.id]
-  access_logs { /*se añaden acces los*/
-    bucket = "gowebapp1234"
-    prefix = "alb-logs"
-    enabled = true
-  }
+#   access_logs { /*se añaden acces los*/
+#     bucket = "gowebapp1234"
+#     prefix = "logs"
+#     enabled = true
+#   }
 }
 
 
