@@ -5,7 +5,6 @@ variable "gowebapp_cluster" {
 
   }
 
-
   variable "region" {
     description = "name of cluster"
     type = string

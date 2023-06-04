@@ -59,29 +59,49 @@ pipeline {
                 withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
                 // sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/u9q6y4u2"
                 sh "docker build -t ecrpipelinedemo ."
-                sh "docker tag ecrpipelinedemo public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
-                sh "docker push public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
+                sh "docker tag ecrpipelinedemo public.ecr.aws/u9q6y4u2/ecrpipelinedemo:latest"
+                sh "docker push public.ecr.aws/u9q6y4u2/ecrpipelinedemo:latest"
                 }
             }
         }
         
-      
-        stage('Deploy in server'){
+
+        stage('Building Infraestructure'){
             steps{
                 script{
-                    def stopcontainer = "docker stop ${JOB_NAME}"
-                    def delcontainer = "docker rm  -f ${JOB_NAME}"
-                    def delimages = "docker image prune -a --force"
-                    def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
-
-                    sshagent(credentials: [ec_2credentialsSecret]){
-                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${stopcontainer}"
-                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delcontainer}"
-                        sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delimages}"
-                        sh "ssh ubuntu@44.204.55.199 ${drun}"
-                    }
+                    sh "terraform init"
+                    sh "terraform plan"
                 }
             }
+                
         }
+        
+         stage("Deploying in AWS"){
+            steps{
+                script{
+                    sh "terraform apply -auto-approve"
+               
+                }
+            }
+                
+        }
+      
+        // stage('Deploy in server'){
+        //     steps{
+        //         script{
+        //             def stopcontainer = "docker stop ${JOB_NAME}"
+        //             def delcontainer = "docker rm  -f ${JOB_NAME}"
+        //             def delimages = "docker image prune -a --force"
+        //             def drun = "docker run -d --name ${JOB_NAME} -p 6565:3000 public.ecr.aws/u9q6y4u2/ecrpipelinedemo:$BUILD_ID"
+
+        //             sshagent(credentials: [ec_2credentialsSecret]){
+        //                 sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${stopcontainer}"
+        //                 sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delcontainer}"
+        //                 sh returnStatus: true, script: "ssh ubuntu@44.204.55.199 ${delimages}"
+        //                 sh "ssh ubuntu@44.204.55.199 ${drun}"
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

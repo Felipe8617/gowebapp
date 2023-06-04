@@ -182,7 +182,7 @@ resource "aws_ecs_task_definition" "gowebapp_task" {
   container_definitions = jsonencode([
     {
       "name" : "gowebapp_container",
-      "image" : "public.ecr.aws/u9q6y4u2/ecrpipelinedemo:128",
+      "image" : "public.ecr.aws/u9q6y4u2/ecrpipelinedemo:latest",
       "memory" : 512,
       "cpu" : 256,
       "essential" : true,
