@@ -172,7 +172,6 @@ resource "aws_ecs_cluster" "gowebapp_cluster" {
   
 }
 
-
 resource "aws_ecs_task_definition" "gowebapp_task" {
   family                   = "gowebapp-task"
   requires_compatibilities = ["FARGATE"]

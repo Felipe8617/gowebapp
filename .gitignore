@@ -6,3 +6,4 @@ terraform.tfvars
 primertf
 tf_fargate_final
 .terraform.lock.hcl
+
