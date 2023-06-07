@@ -242,32 +242,32 @@ output "family_name" {
   value = aws_ecs_task_definition.gowebapp_task.family
 }
 
-# output "family_name" {
-#   value = aws_ecs_task_definition.gowebapp_task.family
-# }
+output "family_name" {
+  value = aws_ecs_task_definition.gowebapp_task.family
+}
 
 
-# jaskldfjlaksjdflajsdfkljalskdfjkavne
-# sdfasvdfasdjsdifjvisdvs
-# dhfaisdhahsdlksavoieuronviaslfvasd
+jaskldfjlaksjdflajsdfkljalskdfjkavne
+sdfasvdfasdjsdifjvisdvs
+dhfaisdhahsdlksavoieuronviaslfvasd
 
-# fsadkjfbaiosufiobasnuvñijsdlfvkñjasd
-# soadnvpaosejnasdñkvjnsadklfvñlsadf
-# func bug() {
+fsadkjfbaiosufiobasnuvñijsdlfvkñjasd
+soadnvpaosejnasdñkvjnsadklfvñlsadf
+func bug() {
 
-# 	var a int = 10
-# 	var b int = 0
-# 	result := a / b
-# 	fmt.Println(result)
-# }
+	var a int = 10
+	var b int = 0
+	result := a / b
+	fmt.Println(result)
+}
 
-# func name() {
-# 	greet("John")
-# 	greet("Jane")
-# }
+func name() {
+	greet("John")
+	greet("Jane")
+}
 
-# func greet(name string) {
-# 	fmt.Println("Hello, " + name)
-# 	fmt.Println("How are you, " + name)
-# 	fmt.Println("Nice to meet you, " + name)
-# }
+func greet(name string) {
+	fmt.Println("Hello, " + name)
+	fmt.Println("How are you, " + name)
+	fmt.Println("Nice to meet you, " + name)
+}
