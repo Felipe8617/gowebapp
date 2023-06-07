@@ -13,9 +13,15 @@ type Users struct {
 }
 
 var InfoUser = Users{
-	Name:  true,
-	Email: 9979797,
-	Phone: "fail test",
+	Name:  "Mary",
+	Email: "maary@mail.com",
+	Phone: 3669977,
+}
+
+var InfoUser = Users{
+	Name:  "Mary",
+	Email: "maary@mail.com",
+	Phone: 3669977,
 }
 
 func Index(rw http.ResponseWriter, r *http.Request) {
@@ -40,4 +46,11 @@ func main() {
 	fmt.Println("Run server: http://localhost:3000")
 	http.ListenAndServe(":3000", nil)
 
+}
+
+func bug() {
+
+	var a int = 10
+	var b int = 0
+	fmt.Println(a / b)
 }

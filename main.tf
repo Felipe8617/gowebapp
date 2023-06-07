@@ -242,3 +242,6 @@ output "family_name" {
   value = aws_ecs_task_definition.gowebapp_task.family
 }
 
+output "family_name" {
+  value = aws_ecs_task_definition.gowebapp_task.family
+}
