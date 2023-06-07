@@ -240,4 +240,4 @@ output "family_name" {
   value = aws_ecs_task_definition.gowebapp_task.family
 }
 
-//adding terraform
+//adding terraform for project (JIRA)
