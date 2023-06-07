@@ -45,7 +45,8 @@ func bug() {
 
 	var a int = 10
 	var b int = 0
-	fmt.Println(a / b)
+	result := a / b
+	fmt.Println(result)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
