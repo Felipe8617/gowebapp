@@ -41,3 +41,15 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 
 }
+
+func print() {
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+	fmt.Println("server is runing on port 3000")
+
+}
