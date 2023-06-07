@@ -6,4 +6,6 @@ terraform.tfvars
 primertf
 tf_fargate_final
 .terraform.lock.hcl
+new_jenkinsFile
+sonar-project11.properties
 
