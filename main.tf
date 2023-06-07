@@ -236,9 +236,8 @@ output "cluster_name" {
   value = var.gowebapp_cluster
 }
 
-
-
 output "family_name" {
   value = aws_ecs_task_definition.gowebapp_task.family
 }
 
+//adding terraform
