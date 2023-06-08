@@ -3,7 +3,12 @@
 #this is a basic go web app to test pipelines
 
 
-
+#sonar.host.url=https://sonarcloud.io
+# sonar.organization=felipe8617
+# sonar.projectKey=Felipe8617_gowebapp
+# sonar.projectName=gowebapp
+# sonar.login=XXXXXXXXXXXXX
+# sonar.sourceEncoding = UTF-8
 
 
 
